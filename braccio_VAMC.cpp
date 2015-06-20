@@ -1,3 +1,8 @@
+
+/*
+ * 				FILE PRINCIPALE DOVE EFFETUARE MODIFICHE
+ * */
+
 #include "Energia.h"
 
 void setup();
