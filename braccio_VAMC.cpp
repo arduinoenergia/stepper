@@ -1,6 +1,6 @@
 
 /*
- * 				FILE PRINCIPALE DOVE EFFETUARE MODIFICHE
+ * 				FILE PRINCIPALE DOVE EFFETTUARE MODIFICHE
  * */
 
 #include "Energia.h"
@@ -57,6 +57,8 @@ void setup() {
   motore1.setSpeed(motorSpeed);
   motore2.setSpeed(motorSpeed);
   enablePWMTimer0();
+  motore1.setUpPWM(1);
+  motore2.setUpPWM(2);
   /// regola il pwm del motore passo passo. Questa funzione oltre ad abilitarlo
   /// lo pone a pontenza nulla (0%)
   initENstepper();
@@ -74,7 +76,7 @@ void setup() {
   digitalWrite(P3_7, LOW);
   digitalWrite(P8_2, LOW);
   /// inizializza i fc mettendo le resteinze di pull-up
-  initFC();
+  /*initFC();
   pinzaSu();
   powerSollPinza(60);
   /// solleva la pinza
@@ -87,7 +89,7 @@ void setup() {
   /// TODO:
   /// scrivere un ciclo di ritardo per permettere alla pinza di aprirsi.
   ritardo(1000000);
-  powerPinza(0);
+  powerPinza(0);*/
 }
 
 ///
@@ -119,134 +121,33 @@ void setup() {
 void loop() {
 
 	volatile unsigned int stato = 0;
-
-	switch(stato){
-
-	case 0:
-		////abbassa la pinza fino al fine corsa e la apre
-		pinzaGiu();
-		powerSollPinza(50);
-		/// attende il fine corsa
-		while(digitalRead(P2_2));
-		/// spegne il motore
-		powerSollPinza(0);
-		stato = 1;
-	break;
-
-	case 1:
-		/// stringe la pinza
-		chiudePinza();
-		/// con forza al 60%
-		powerPinza(60);
-		ritardo(500000);
-		powerPinza(0);
-		stato = 2;
-	break;
-
-	case 2:
-		/// solleva la pinza a fine corsa
-		pinzaSu();
-		// potenza al 60%
-		powerSollPinza(60);
-		/// solleva la pinza
-		while(digitalRead(P2_0));
-		/// motore spento
-		powerSollPinza(0);
-		ritardo(1000);
-		stato = 3;
-	break;
-
-	case 3:
-		/// ruota il primo braccio di 90°
-		motore1.powerMotor(60);
-		motore2.powerMotor(40);
-		/// il numero di passi per giro e' 200, lo faccio girare di 90° (200/4 = 50)
-		motore1.step(50);
-		ritardo(1000);
-		stato = 4;
-	break;
-
-
-	case 4:
-		/// ruota il secondo braccio di 90°
-		motore1.powerMotor(40);
-		motore2.powerMotor(60);
-		/// il numero di passi per giro e' 200, lo faccio girare di 90° (200/4 = 50)
-		motore2.step(50);
-		stato = 5;
-	break;
-
-	case 5:
-		/// abbassa la pinza fino al fc
-		/// tiene in coppia i motori stepper ma limita la corrente.
-		motore1.powerMotor(40);
-		motore2.powerMotor(40);
-		pinzaGiu();
-		powerSollPinza(50);
-		/// attende il fine corsa
-		while(digitalRead(P2_2));
-		/// spegne il motore
-		powerSollPinza(0);
-		stato = 6;
-
-	break;
-
-	case 6:
-		/// apre la pinza
-		/// apre la pinza
-		aprePinza();
-		powerPinza(60);
-		///
-		/// scrivere un ciclo di ritardo per permettere alla pinza di aprirsi.
-		ritardo(1000000);
-		powerPinza(0);
-		stato = 7;
-	break;
-
-	case 7:
-		/// solleva la pinza fino al fc
-		pinzaSu();
-		// potenza al 60%
-		powerSollPinza(60);
-		/// solleva la pinza fino al segnale del fine corsa
-		while(digitalRead(P2_0));
-		/// motore spento
-		powerSollPinza(0);
-		ritardo(1000);
-		stato = 8;
-
-	break;
-
-	case 8:
-		/// ruota il secondo braccio di -90
-		motore1.powerMotor(40);
-		motore2.powerMotor(60);
-		/// il numero di passi per giro e' 200, lo faccio girare di 90° (200/4 = 50)
-		motore2.step(-50);
-		stato = 9;
-
-	break;
-
-
-	case 9:
-		/// ruota il primo braccio di -90
-		motore1.powerMotor(60);
-		motore2.powerMotor(40);
-		/// il numero di passi per giro e' 200, lo faccio girare di 90° (200/4 = 50)
-		motore1.step(-50);
-		ritardo(1000);
-		stato = 10;
-	break;
-
-
-	case 10:
-	//	torna allo stato 0
-		/// tiene in coppia i motori stepper ma limita la corrente.
-		motore1.powerMotor(40);
-		motore2.powerMotor(40);
-		ritardo(1000);
-		stato = 0;
-	break;
-
+	volatile unsigned int i;
+	/// test PWM movimento pinza (8kHz)
+	for (i = 0; i < 100; i+=10){
+		powerSollPinza(i);
+		ritardo(100000);
 	}
+	powerSollPinza(0);
+	/// test PWM presa pinza
+	for (i = 0; i < 100; i+=10){
+		powerPinza(i);
+		ritardo(100000);
+	}
+	powerPinza(0);
+
+	/// test PWM motore stepper 1 (1kHz)
+	for(i = 0; i < 100; i+= 10){
+		motore1.powerMotor(i);
+		ritardo(300000);
+	}
+	motore1.powerMotor(0);
+
+	/// test PWM motore stepper 2 (1kHz)
+	for(i = 0; i < 100; i+= 10){
+		motore2.powerMotor(i);
+		ritardo(300000);
+	}
+	motore2.powerMotor(0);
+
+
 }
