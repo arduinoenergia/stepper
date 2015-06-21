@@ -1,0 +1,8 @@
+/Debug
+.settings/org.eclipse.cdt.codan.core.prefs
+.c*
+.setting*
+.launches/braccio_VAMC.launch
+.project
+targetConfigs/MSP430F5529.ccxml
+targetConfigs/readme.txt

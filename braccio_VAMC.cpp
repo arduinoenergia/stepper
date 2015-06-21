@@ -52,6 +52,8 @@ void setup() {
   motore1.setSpeed(motorSpeed);
   motore2.setSpeed(motorSpeed);
   enablePWMTimer0();
+  motore1.setUpPWM(1);
+  motore2.setUpPWM(2);
   /// regola il pwm del motore passo passo. Questa funzione oltre ad abilitarlo
   /// lo pone a pontenza nulla (0%)
   initENstepper();
